@@ -1,6 +1,7 @@
 import FileUtils
 import datetime
 import matplotlib
+import pandas as pd
 
 
 def convertToCelsius(fahrenheit):
@@ -9,9 +10,15 @@ def convertToCelsius(fahrenheit):
     return celsius
 
 
+def testDataSet(data):
+    '''Tests if the number of lines is (C*YN*365) + (C*YL*366) + 1 Where 
+        C is the number of Cities, YN is the number of regular years and YL is the number of leap years'''
+    pass
+
+
 def consolidateData(cities, startDate, endDate, outputFileName):
     '''
-    Creates a single file containing the average daily temperatures, in Celsius, 
+    Creates a single file containing the average daily temperatures, in Celsius,
     for each city for each date in the date range. The output should be as shown below:
     City, Date, Temperature
     alphabetically, earliest, temperature
@@ -20,42 +27,61 @@ def consolidateData(cities, startDate, endDate, outputFileName):
     # First, read city_info.csv
     # fileList = FileUtils.readIntoList("city_info.csv")
     # print(fileList)
+    lines = FileUtils.readIntoList("sourcedata/city_info.csv")
+
+    cities = [name.lower() for name in cities]
+    # print(cities)
+
+    outputList = []
+    listToSearch = []
+    for i in range(len(lines)):
+        lines[i] = lines[i].replace('"', "")
+        rows = lines[i].strip().split(",")
+        if (rows[1].lower() in cities):
+            listToSearch.append(rows)
+
+    fileDataResult = [["CITY", "DATE", "TEMPERATURE"]]
+    for i in range(len(listToSearch)):
+        city = listToSearch[i][1].strip()
+        # print(city)
+        file = FileUtils.readIntoList(
+            "sourcedata/"+listToSearch[i][2].strip() + ".csv")
+
+        for j in range(len(file)):
+            file[j] = file[j].replace('"', "")
+            fileRow = file[j].split(",")
+            # format_data = "%y-%"
+            date = fileRow[1]
+            # check if row date is inside the range of dates
+            if (date > startDate and date < endDate and date != "NA"):
+                # get the temperature average for the row
+                try:
+                    avgTemp = (int(fileRow[2]) + int(fileRow[3]))/2
+                    avgTemp = convertToCelsius(avgTemp)
+                except:
+                    print("temperature unavailable for city " +
+                          city + " in date: " + date)
+                    # temperature unavailable
+                    return
+
+                else:
+                    fileDataResult.append([city, date, avgTemp])
+    # sort list
+    fileDataResult = sorted(fileDataResult, key=lambda x: (x[0], x[1]))
+    # send to outputFile
+    # first make each list into a string
+    sendToOutput = []
+    for i in range(len(fileDataResult)):
+        sendToOutput.append(','.join(map(str, fileDataResult[i])))
+
+    FileUtils.writeListToFile(sendToOutput, outputFileName)
+    # print(listToSearch)
+    return fileDataResult
 
 
-lines = FileUtils.readIntoList("sourcedata/city_info.csv")
-
-xvals = []
-yvas = []
-dataList = []
-for i in range(len(lines)):
-    dataList.append(lines[i].split(","))
-# having the list of Countries with the respective file name, we will use it to make an
-# list to store the city name, Date and temperature.
-completeList = []
-for i in range(1, 3):  # len(dataList)):
-    # read the file for the city
-    filename = dataList[i][2][1:-1]
-    cityFile = FileUtils.readIntoList("sourcedata/"+filename + ".csv")
-    cityName = dataList[i][1][1:-1]
-
-    # get the Date and Average Temperature for each date
-    for j in range(1, 10):  # len(cityFile)):
-        cityFileLine = cityFile[j].split(",")
-        # try to calculate the avgTemp
-        try:
-
-            avgTemp = convertToCelsius(
-                (int(cityFileLine[2]) + int(cityFileLine[3]))/2)
-
-        except:
-            # this date has no temperature information
-            avgTemp = None
-
-        finally:
-            date = cityFileLine[1]
-            avgTempFormat = "{avgTemp:.2f}"
-            outPutLine = cityName+"," + date + \
-                "," + avgTempFormat.format(avgTemp=avgTemp)
-            completeList.append(outPutLine)
-print(completeList[0][1])
-FileUtils.writeListToFile(completeList, "testOutput.csv")
+cities = ["Atlanta", "Eugene", "Fargo", "Jacksonville"]
+startDate = "1997-01-01"
+endDate = "2017-01-01"
+outputFileName = "test1.csv"
+result = consolidateData(cities, startDate, endDate, outputFileName)
+# print(result)
