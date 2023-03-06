@@ -10,6 +10,6 @@ def readIntoList(filename):
 def writeListToFile(lines, fileName):
     fout = open(fileName, 'w')
     for line in lines:
-        print(line)
+        # print(line)
         fout.write(line + "\n")
     fout.close()
