@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 import TemperatureHelper
+import statistics
+import PartB as th
+
+temp_helper = th.TemperatureHelper("test1.csv")
+print(temp_helper.data["Atlanta"]["1998"])
 
 MONTH_NAMES = [
     'January',
@@ -19,23 +25,102 @@ MONTH_NAMES = [
 plt.rcParams["figure.figsize"] = [10, 6]  # bigger than default
 
 
-def annualMeansPerCity(cities, years):
-    '''find the mean for each city and each year'''
-    '''save one chart per city'''
-    pass
+def annual_means_per_city(cities, years):
+    for city in cities:
+        x_vals = []  # years
+        y_vals = []  # temperatures
+        for year in years:
+            # assert city in temp_helper.data, "requested city is not available"
+            # assert year in temp_helper.data[city], "requested year is not available"
+            appendInY = temp_helper.getYearlyTemperatures(
+                city, year)
+            # make values into float
+            for key1, value1 in appendInY:
+                for key2, value2 in value1.items():
+                    appendInY[key1][key2] = float(value2)
+            print(appendInY)
+
+            y_vals.append(appendInY).mean())
+            x_vals.append(int(year))
+
+        # create graph
+        plt.plot(y_vals, x_vals, 'bo')
+        plt.title(f"Annual Mean Temperatures for {city}")
+        plt.xlabel("Year")
+        plt.ylabel("Temperature (°C)")
+        # Save the plot to a file
+        plt.savefig(f'PartC/{city}.png')
+        plt.show()
 
 
-def annualMeansCombined(cities, years, patterns):
-    '''find the means for the cities in the timespan, 
-    and show each as a separate series'''
-    pass
+def annual_means_combined(cities, years, patterns):
+    for city in cities:
+        x_vals=[]  # years
+        y_vals=[]  # temperatures
+        for year in years:
+            assert city in temp_helper.data, "requested city is not available"
+            assert year in temp_helper.data[city], "requested year is not available"
+            y_vals.append(temp_helper.getYearlyTemperatures(
+                city, int(year)).mean())
+            x_vals.append(int(year))
+
+        # create graph
+        plt.plot(x_vals, y_vals, patterns[cities.index(city)])
+        plt.title(
+            f"Annual Mean Temperatures for {cities}")
+        plt.xlabel("Year")
+        plt.ylabel("Temperature (°C)")
+    plt.legend(cities)
+    # Save the plot to a file
+    plt.savefig(f'output/PartC/combined.png')
+    plt.show()
 
 
-def singleDayPerCity(cities, years, month, day):
-    '''create one chart per city'''
-    pass
+def single_day_per_city(cities, years, month, day):
+    for city in cities:
+        daily_temps=[]
+        for year in years:
+            # Calculate daily temp for each day of that year
+            daily_temp=temp_helper.getDailyTemperature(
+                city, year, month, day)
+            # Plot the annual means for each city
+            daily_temps.append(daily_temp)
+
+        plt.plot(years, daily_temps)
+
+        # Set graph title and axis labels
+        plt.title(
+            f'Temperature for The Date: {MONTH_NAMES[month - 1]}, {day} over Years for {city}')
+        plt.xlabel('Year')
+        plt.ylabel('Daily Temperature (°C)')
+        plt.savefig(
+            f'output/partC-daily-temps/DailyTemp-{city}-{month}-{day}.png')
+        plt.close()
 
 
-def singleDayCombined(cities, years, month, day, patterns):
-    ''' create a single chart with each city as a series'''
-    pass
+def single_day_combined(cities, years, month, day, patterns):
+    for city in cities:
+        x_vals=[]  # years
+        y_vals=[]  # temperatures
+        for year in years:
+            assert city in temp_helper.data, "requested city is not available"
+            assert year in temp_helper.data[city], "requested year is not available"
+            y_vals.append(temp_helper.getDailyTemperature(
+                city, int(year), month, day))
+            x_vals.append(int(year))
+
+        # create graph
+        plt.plot(x_vals, y_vals, patterns[cities.index(city)])
+        plt.title(
+            f"Temperature on {MONTH_NAMES[month - 1]} {day} for {list_to_string(cities, 'and')}")
+        plt.xlabel("Year")
+        plt.ylabel("Temperature (°C)")
+    plt.legend(cities)
+    # Save the plot to a file
+    plt.savefig(f'output/PartC/single_day_combined_{month}_{day}.png')
+    plt.close()
+
+
+# # cities
+# atlanta = data.getYearlyTemperatures("Atlanta", "2000")
+# print(test)

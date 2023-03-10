@@ -34,14 +34,16 @@ class TemperatureHelper:
             # print(self.data["Atlanta"]['2011']["01"])
 
     def getDailyTemperature(self, city, year, month, day):
-        '''Returns the temperature for the specified city and date'''
+        '''Returns the temperature for the specified city and 
+        date'''
         return self.data[city][year][month][day]
 
     def getYearlyTemperatures(self, city, year):
-        '''Returns a numpy array containin the temperatures for the specified city
+        '''Returns a numpy array containin the temperatures
+         for the specified city
             for each day of the specified year
         '''
-        result = np.array(self.data[city][year])
+        return np.array(self.data[city][year])
 
 
 # data set goes from 1998 to 2018
