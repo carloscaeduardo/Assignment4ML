@@ -50,7 +50,6 @@ def annual_means_per_city(cities, years):
 
 
 def annual_means_combined(cities, years, patterns):
-    citiesvalues = []
     for city in cities:
         x_vals = []  # years
         y_vals = []  # temperatures
@@ -75,7 +74,8 @@ def annual_means_combined(cities, years, patterns):
 
 
 def single_day_per_city(cities, years, month, day):
-
+    '''Creates and save one graph per city, each showing the temperature on the
+        specified day for each specified year'''
     for city in cities:
         daily_temps = []
         for year in years:
@@ -83,17 +83,18 @@ def single_day_per_city(cities, years, month, day):
             daily_temp = temp_helper.getDailyTemperature(
                 city, year, month, day)
             # Plot the annual means for each city
-            daily_temps.append(daily_temp)
+            daily_temps.append(float(daily_temp))
 
         plt.plot(years, daily_temps)
 
         # Set graph title and axis labels
         plt.title(
-            f'Temperature for The Date: {MONTH_NAMES[month - 1]}, {day} over Years for {city}')
+            f'Temperature for The Date: {MONTH_NAMES[int(month) - 1]}, {day} over Years for {city}')
         plt.xlabel('Year')
         plt.ylabel('Daily Temperature (°C)')
         plt.savefig(
-            f'output/partC-daily-temps/DailyTemp-{city}-{month}-{day}.png')
+            f'partC-daily-temps/DailyTemp-{city}-{month}-{day}.png')
+        plt.show()
         plt.close()
 
 
@@ -104,19 +105,20 @@ def single_day_combined(cities, years, month, day, patterns):
         for year in years:
             assert city in temp_helper.data, "requested city is not available"
             assert year in temp_helper.data[city], "requested year is not available"
-            y_vals.append(temp_helper.getDailyTemperature(
-                city, int(year), month, day))
-            x_vals.append(int(year))
+            y_vals.append(round(float(temp_helper.getDailyTemperature(
+                city, year, month, day)), 2))
+            x_vals.append(year)
 
         # create graph
         plt.plot(x_vals, y_vals, patterns[cities.index(city)])
         plt.title(
-            f"Temperature on {MONTH_NAMES[month - 1]} {day} for {list_to_string(cities, 'and')}")
+            f"Temperature on {MONTH_NAMES[int(month) - 1]} {day} for {','.join((cities))}")
         plt.xlabel("Year")
         plt.ylabel("Temperature (°C)")
     plt.legend(cities)
     # Save the plot to a file
-    plt.savefig(f'output/PartC/single_day_combined_{month}_{day}.png')
+    plt.savefig(f'PartC/single_day_combined_{month}_{day}.png')
+    plt.show()
     plt.close()
 
 
