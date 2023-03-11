@@ -78,6 +78,7 @@ def consolidateData(cities, startDate, endDate, outputFileName):
     fileDataResult = [["CITY", "DATE", "TEMPERATURE"]]
     for i in range(len(listToSearch)):
         city = listToSearch[i][1].strip()
+        city = city.title()
         # print(city)
         file = FileUtils.readIntoList(
             "sourcedata/"+listToSearch[i][2].strip() + ".csv")

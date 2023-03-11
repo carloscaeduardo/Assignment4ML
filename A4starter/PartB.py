@@ -34,7 +34,7 @@ class TemperatureHelper:
             # print(self.data["Atlanta"]['2011']["01"])
 
     def getDailyTemperature(self, city, year, month, day):
-        '''Returns the temperature for the specified city and 
+        '''Returns the temperature for the specified city and
         date'''
         return self.data[city][year][month][day]
 
@@ -43,12 +43,20 @@ class TemperatureHelper:
          for the specified city
             for each day of the specified year
         '''
-        return np.array(self.data[city][year])
+
+        temperatures = []
+        for month in self.data[city][year]:
+            for day in self.data[city][year][month]:
+                for value in self.data[city][year][month][day]:
+                    temperatures.append(
+                        self.getDailyTemperature(city, year, month, day))
+        # convert to a list with ONLY temperature values for each day
+        # print(len(temperatures))
+        return np.array(temperatures)
 
 
 # data set goes from 1998 to 2018
-
-# data = TemperatureHelper("test1.csv")
+data = TemperatureHelper("output/partA.csv")
 # temp1 = data.getDailyTemperature("Atlanta", '2000', '10', '01')
 # print("getDailyTemperature test 1: " + temp1)
 
@@ -57,3 +65,6 @@ class TemperatureHelper:
 
 # temp3 = data.getDailyTemperature('Jacksonville', '2017', '12', '29')
 # print("getDailyTemperature test 3: " + temp3)
+
+temp1 = data.getYearlyTemperatures("Atlanta", "2000")
+print(temp1)
