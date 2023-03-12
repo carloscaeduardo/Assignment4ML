@@ -199,6 +199,54 @@ def single_day_combined(cities, years, month, day, patterns):
     plt.close()
 
 
+def calcNationalAnnualMeans(cities, years):
+    '''Calculates the national annual mean temperature for each year specified'''
+    allyears = []
+    for year in years:
+        nationalAnnualMean = 0
+        for city in cities:
+            appendInY = temp_helper.getYearlyTemperatures(
+                city, year)
+            appendInY = appendInY.astype(float)
+            # mean for a city in the year
+            mean = np.mean(appendInY)
+            nationalAnnualMean += mean
+        # calculate the annual mean for each city
+        nationalAnnualMean = nationalAnnualMean / len(cities)
+        allyears.append(nationalAnnualMean)
+    return allyears
+
+
+def nationalAnnualMeans(cities, years):
+    newYears = []
+    for year in years:
+        year = int(year)
+        newYears.append(year)
+    data = calcNationalAnnualMeans(cities, years)
+    # create graph
+    # polyfit finds a polynomial that is the best fit for the data
+    # model = plt.polyfit(xVals, yVals, 1)  # 1 is the polynomial degree
+    model1 = np.polyfit(newYears, data, 1)
+    # polyval evaluates a polynomial at the specified x values and returns
+    # the computed y values
+    compYVals = np.polyval(model1, newYears)
+    rsq = tools.r_squared(np.array(data), np.array(compYVals))
+    seSlope = tools.se_over_slope(np.array(newYears), np.array(
+        data), np.array(compYVals), np.array(model1))
+    plt.plot(years, data, 'bo', label='Data Points')
+    plt.plot(years, compYVals, 'r', label='Linear Fit')
+
+    plt.title(
+        f"National Annual Mean Temperatures for {','.join((cities))}"+'\n R^2 = ' + str(rsq) + "\n" + "SE to Slope = " + str(seSlope))
+    plt.xlabel("Year")
+    plt.ylabel("Mean Temperature (°C)")
+
+    # Save the plot to a file
+    # plt.savefig(f'PartC/single_day_combined_{month}_{day}.png')
+    plt.show()
+    plt.close()
+
+
 # # cities
 # atlanta = data.getYearlyTemperatures("Atlanta", "2000")
 # print(test)
